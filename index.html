@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<title>MemeMaker-Simple</title>
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    #image-container {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+	<div>
+		<input type="file" id="file"/>
+	</div>
+	<div id="image-container">
+    	<canvas width="500" height="500"></canvas>
+    <div>
+	<div>
+		<span>Top Line:</span><br/>
+		<input id="topText" type="text"><br/>
+		<span>Bottom Line:</span><br/>
+		<input id="bottomText" type="text"><br/>
+		<button id="makeBtn">Make meme</button>
+	</div>
+
+	<script>
+	function textChangeListener(evt) {
+		var id = evt.target.id;
+		var text = evt.target.value;
+
+		if (id == "topText") {
+			window.topText = text;
+		} else {
+			window.bottomText = text;
+		}
+		redrawMeme(window.imageSrc, window.topText,window.bottomText);
+	}
+	function redrawMeme(image,topLine, bottomLine) {
+		var canvas = document.querySelector('canvas')
+		var ctx = canvas.getContext("2d");
+		
+		if (image != null)
+			ctx.drawImage(image,0,0,canvas.width,canvas.height);
+
+		//text attributes
+		ctx.font = '30pt Impact';
+		ctx.textAlign = 'center';
+		ctx.strokeStyle = 'black';
+		ctx.lineWidth = 3;
+		ctx.fillStyle = 'white';
+
+		if(topLine != null) {
+			ctx.fillText(topLine, canvas.width /2, 40);
+			ctx.strokeText(topLine, canvas.width /2, 40);
+		}
+		if(bottomLine != null) {
+			ctx.fillText(bottomLine, canvas.width /2, canvas.height - 20);
+			ctx.strokeText(bottomLine, canvas.width /2, canvas.height - 20);
+		}
+	}
+	function saveFile(){
+		window.open(document.querySelector('canvas').toDataURL());
+	}
+	function handleFileSelect(evt) {
+		var canvasWidth = 500;
+		var canvasHeight = 500;
+		var file = evt.target.files[0];
+
+		var reader = new FileReader();
+		reader.onload = function(fileObject) {
+			var data = fileObject.target.result;
+
+			var image =  new Image();
+			image.onload = function() {
+				window.imageSrc = this;
+				redrawMeme(window.imageSrc, null, null);
+			}
+			image.src = data;
+			console.log(fileObject.target.result);
+		};
+		reader.readAsDataURL(file)
+	}
+	window.topText = "";
+    window.bottomText = "";
+    var input1 = document.getElementById('topText');
+    var input2 = document.getElementById('bottomText');
+    input1.oninput = textChangeListener;
+    input2.oninput = textChangeListener;
+    document.getElementById('file').addEventListener('change', handleFileSelect, false);
+    document.querySelector('button').addEventListener('click', saveFile, false);
+	
+	</script>
+</body>
+</html>
